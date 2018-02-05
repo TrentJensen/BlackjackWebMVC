@@ -1,0 +1,31 @@
+﻿@model GameCreator
+
+<div class="container">
+
+    <div class="row">
+        @foreach (var card in Model.DealerHand)
+        {
+            <img src="@card.ImageName" />
+
+        }
+    </div>
+    <hr />
+    <div class="row">
+        @foreach (var card in Model.PlayerHand)
+        {
+            <img class="img-rounded" src="@card.ImageName" />
+
+        }
+        <p>Player Points: @Model.PlayerScore</p>
+    </div>
+
+    <div class="col-lg-5">
+        <p class="button">
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Hit">Hit Me</a>
+        </p>
+        <p class="button">
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Hold">Hold</a>
+        </p>
+    </div>
+
+</div>
