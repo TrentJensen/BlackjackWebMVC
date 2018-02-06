@@ -25,15 +25,26 @@ namespace BlackJackWeb.Controllers
             return View(_gameCreator);
         }
 
+        public IActionResult Results()
+        {
+            return View(_gameCreator);
+        }
+
         public RedirectToActionResult Hit()
         {
             _gameCreator.PullPlayerCard();
 
-            return RedirectToAction("Index");
+            if (_gameCreator.PlayerScore < 21)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+                return RedirectToAction("Results");
         }
 
         public RedirectToActionResult Hold()
         {
+            _gameCreator.PlayerHold();
 
             return RedirectToAction("Index");
         }

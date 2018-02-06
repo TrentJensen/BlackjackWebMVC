@@ -17,6 +17,9 @@ namespace BlackJackWeb.Models
         public List<Card> DealerHand { get; set; }
 
         public int PlayerScore { get; set; }
+        public int DealerScore { get; set; }
+
+        public bool Hold = false;
 
         public string GameId { get; set; }
 
@@ -25,9 +28,6 @@ namespace BlackJackWeb.Models
         /// </summary>
         public GameCreator()
         {
-            PlayerHand = new List<Card>();
-            DealerHand = new List<Card>();
-
             _deck = new List<Card>(DECK_SIZE);
             foreach (var suit in new[] { "Spades", "Hearts", "Clubs", "Diamonds", })
             {
@@ -42,7 +42,19 @@ namespace BlackJackWeb.Models
                 }
             }
 
+            NewGame();
+        }
+
+        private void NewGame()
+        {
+            Hold = false;
+            PlayerHand = new List<Card>();
+            DealerHand = new List<Card>();
+            PlayerScore = 0;
+            DealerScore = 0;
+
             PullPlayerCard();
+            PullDealerCard();
             PullDealerCard();
         }
 
@@ -70,7 +82,24 @@ namespace BlackJackWeb.Models
             _deck.Remove(_deck[randNum]);
 
             PlayerHand.Add(tempCard);
-            UpdateScores();
+
+            //Update player score
+            if (tempCard.Rank == 1)
+            {
+                PlayerScore += 11;
+                if (PlayerScore > 21)
+                {
+                    PlayerScore -= 10;
+                }
+            }
+            else if (tempCard.Rank < 11)
+            {
+                PlayerScore += tempCard.Rank;
+            }
+            else if (tempCard.Rank >= 11)
+            {
+                PlayerScore += 10;
+            }
         }
 
         //Returns a random card and places it in the dealer's hand
@@ -85,52 +114,40 @@ namespace BlackJackWeb.Models
             tempCard = _deck[randNum];
             _deck.Remove(_deck[randNum]);
 
-            //UpdateScores();
-
             DealerHand.Add(tempCard);
-        }
 
-        public void UpdateScores()
-        {
-            PlayerScore = 0;
-            int count = 0;
-            bool[] isAce = new bool[PlayerHand.Count];
-
-            foreach (Card card in PlayerHand)
+            //Update dealer score
+            if (tempCard.Rank == 1)
             {
-                if (card.Rank == 1)
-                { 
-                    PlayerScore += 11;
-                    isAce[count] = true;
-                }
-                else if (card.Rank < 11)
+                DealerScore += 11;
+                if (DealerScore > 21)
                 {
-                    PlayerScore += card.Rank;
+                    DealerScore -= 10;
                 }
-                else if (card.Rank >= 11)
-                {
-                    PlayerScore += 10;
-                }
-                count++;
             }
-
-            //Double-check aces if score is over 21
-            while (PlayerScore > 21 && isAce != null)
+            else if (tempCard.Rank < 11)
             {
-                for (int i = 0; i < isAce.Count(); i++)
-                {
-                    if (isAce[i] == true)
-                    {
-                        PlayerScore -= 10;
-                        isAce[i] = false;
-                    }
-                }
+                DealerScore += tempCard.Rank;
+            }
+            else if (tempCard.Rank >= 11)
+            {
+                DealerScore += 10;
             }
         }
 
-        public Card PullCard()
+        public void PlayerHold()
         {
-            throw new NotImplementedException();
+            Hold = true;
+
+            while (DealerScore < 21)
+            {
+                if (DealerScore > PlayerScore)
+                {
+                    break;
+                }
+
+                PullDealerCard();
+            }
         }
     }
 }
