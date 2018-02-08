@@ -25,9 +25,8 @@ namespace BlackJackWeb.Models
 
         public bool Stand = false;
 
-        public enum Results { Playing, Bust, PlayerWins, DealerWins }
+        public enum Results { Playing, Bust, PlayerWins, DealerWins, Shuffle }
         public Results FinalResults { get; set; }
-
 
         public string GameId { get; set; }
 
@@ -87,49 +86,57 @@ namespace BlackJackWeb.Models
             int randNum;
             Random random = new Random();
 
-            randNum = random.Next(0, _deck.Count());
-
-            tempCard = _deck[randNum];
-            _deck.Remove(_deck[randNum]);
-
-            PlayerHand.Add(tempCard);
-
-            //Update player score
-            if (tempCard.Rank == 1)
+            if (_deck.Count == 0)
             {
-                _playerAces++;
-                PlayerScore += 11;
+                FinalResults = Results.Shuffle;
+                Shuffle();
             }
-            else if (tempCard.Rank < 11)
+            else
             {
-                PlayerScore += tempCard.Rank;
-            }
-            else if (tempCard.Rank >= 11)
-            {
-                PlayerScore += 10;
-            }
+                randNum = random.Next(0, _deck.Count());
+                tempCard = _deck[randNum];
+                _deck.Remove(_deck[randNum]);
 
-            //Changes Aces from 11 to 1 if hand is over 21
-            if (_playerAces > 0)
-            {
-                int count = 0;
+                PlayerHand.Add(tempCard);
 
-                while (PlayerScore > 21 && count < _playerAces)
+                //Update player score
+                if (tempCard.Rank == 1)
                 {
-                    PlayerScore -= 10;
-                    count++;
+                    _playerAces++;
+                    PlayerScore += 11;
                 }
-            }
+                else if (tempCard.Rank < 11)
+                {
+                    PlayerScore += tempCard.Rank;
+                }
+                else if (tempCard.Rank >= 11)
+                {
+                    PlayerScore += 10;
+                }
 
-            //If player busts
-            if (PlayerScore > 21)
-            {
-                Stand = true;
-                FinalResults = Results.Bust;
-            }
-            else if (PlayerScore == 21)
-            {
-                PlayerStand();
+                //Changes Aces from 11 to 1 if hand is over 21
+                if (_playerAces > 0)
+                {
+                    int count = 0;
+
+                    while (PlayerScore > 21 && count < _playerAces)
+                    {
+                        PlayerScore -= 10;
+                        count++;
+                        _playerAces--;
+                    }
+                }
+
+                //If player busts
+                if (PlayerScore > 21)
+                {
+                    Stand = true;
+                    FinalResults = Results.Bust;
+                }
+                else if (PlayerScore == 21)
+                {
+                    PlayerStand();
+                }
             }
         }
 
@@ -143,43 +150,52 @@ namespace BlackJackWeb.Models
             int newValue = 0;
             Random random = new Random();
 
-            randNum = random.Next(0, _deck.Count());
-
-            tempCard = _deck[randNum];
-            _deck.Remove(_deck[randNum]);
-
-            DealerHand.Add(tempCard);
-
-            //Update dealer score
-            if (tempCard.Rank == 1)
+            if (_deck.Count == 0)
             {
-                _dealerAces++;
-                newValue += 11;
+                FinalResults = Results.Shuffle;
+                Shuffle();
             }
-            else if (tempCard.Rank < 11)
-            {
-                newValue += tempCard.Rank;
-            }
-            else if (tempCard.Rank >= 11)
-            {
-                newValue += 10;
-            }
-
-            //Hold the value of the first card a secret
-            if (DealerHand.Count == 1)
-                _hiddenCardValue = newValue;
             else
-                DealerScore += newValue;
-
-            //Changes Aces from 11 to 1 if hand is over 21
-            if (_dealerAces > 0)
             {
-                int count = 0;
+                randNum = random.Next(0, _deck.Count());
 
-                while (DealerScore > 21 && count < _dealerAces)
+                tempCard = _deck[randNum];
+                _deck.Remove(_deck[randNum]);
+
+                DealerHand.Add(tempCard);
+
+                //Update dealer score
+                if (tempCard.Rank == 1)
                 {
-                    DealerScore -= 10;
-                    count++;
+                    _dealerAces++;
+                    newValue += 11;
+                }
+                else if (tempCard.Rank < 11)
+                {
+                    newValue += tempCard.Rank;
+                }
+                else if (tempCard.Rank >= 11)
+                {
+                    newValue += 10;
+                }
+
+                //Hold the value of the first card a secret
+                if (DealerHand.Count == 1)
+                    _hiddenCardValue = newValue;
+                else
+                    DealerScore += newValue;
+
+                //Changes Aces from 11 to 1 if hand is over 21
+                if (_dealerAces > 0)
+                {
+                    int count = 0;
+
+                    while (DealerScore > 21 && count < _dealerAces)
+                    {
+                        DealerScore -= 10;
+                        count++;
+                        _dealerAces--;
+                    }
                 }
             }
         }
@@ -200,6 +216,28 @@ namespace BlackJackWeb.Models
             }
 
             EndResults();
+        }
+
+        private void Shuffle()
+        {
+            _deck.Clear();
+            foreach (var suit in new[] { "Spades", "Hearts", "Clubs", "Diamonds", })
+            {
+                for (var rank = 1; rank <= (DECK_SIZE / 4); rank++)
+                {
+                    _deck.Add(new Card
+                    {
+                        Rank = rank,
+                        Suit = suit,
+                        ImageName = $@"images/{rank}_of_{suit}.jpg"
+                    });
+                }
+            }
+        }
+
+        public void Continue()
+        {
+            FinalResults = Results.Playing;
         }
 
         private void EndResults()

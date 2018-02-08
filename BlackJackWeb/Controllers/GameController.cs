@@ -41,9 +41,15 @@ namespace BlackJackWeb.Controllers
             return RedirectToAction("Index");
         }
 
-        public RedirectToActionResult Continue()
+        public RedirectToActionResult NewGame()
         {
             _gameCreator.NewGame();
+            return RedirectToAction("Index");
+        }
+
+        public RedirectToActionResult Continue()
+        {
+            _gameCreator.Continue();
             return RedirectToAction("Index");
         }
     }

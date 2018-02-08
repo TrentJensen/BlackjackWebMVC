@@ -1,54 +1,69 @@
 ﻿@model GameCreator
 
 <div class="row">
-    <div class="col-md-11">
-        @if (Model.Stand)
-        {
-        <img class="img-responsive" src="~/@Model.DealerHand[0].ImageName" />
-        }
-        else
-        {
-        <img class="img-responsive" src="~/images/back.jpg" />
-        }
+    <div class="col-xs-12 col-sm-11">
+        <div class="row">
+            <h1>Dealer Points: @Model.DealerScore</h1>
+        </div>
+        <div class="row">
+            @if (Model.Stand)
+            {
+                <div class="col-xs-6 col-sm-4 col-md-2">
+                    <img class="img-responsive" src="~/@Model.DealerHand[0].ImageName" />
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-6 col-sm-4 col-md-2">
+                    <img class="img-responsive" src="~/images/back.jpg" />
+                </div>
+            }
 
-        @foreach (var card in Model.DealerHand.Skip(1))
-        {
-        <img class="img-responsive" src="~/@card.ImageName" />
-        }
-    </div>
-    <div class="col-md-1">
-        <h1 class="text-center">Dealer Points: @Model.DealerScore</h1>
+            @foreach (var card in Model.DealerHand.Skip(1))
+            {
+                <div class="col-xs-6 col-sm-4 col-md-2">
+                    <img class="img-responsive" src="~/@card.ImageName" />
+                </div>
+            }
+        </div>
     </div>
 </div>
 
 <hr />
 
 <div class="row">
-    <div class="col-md-11 col-sm-11">
-        @foreach (var card in Model.PlayerHand)
-        {
-        <img class="img-responsive" src="~/@card.ImageName" />
-        }
-    </div>
-    <div class="col-md-1">
-        <h1 class="text-center">Player Points: @Model.PlayerScore</h1>
+    <div class="col-xs-12 col-sm-11">
+        <div class="row">
+            <h1>Player Points: @Model.PlayerScore</h1>
+        </div>
+        <div class="row">
+            @foreach (var card in Model.PlayerHand)
+            {
+                <div class="col-xs-6 col-sm-4 col-md-2">
+                    <img class="img-responsive" src="~/@card.ImageName" />
+                </div>
+            }
+        </div>
     </div>
 </div>
+
+<br />
 
 @if (Model.FinalResults == GameCreator.Results.Playing)
 {
     <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 button btn-group">
+        <div class="col-xs-4 col1 center-block button">
             <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Hit">Hit Me</a>
             <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Stand">Stand</a>
         </div>
-        <div class="col-md-3"></div>
     </div>
+
 }
 else
 {
-@await Component.InvokeAsync("Results")
+    <div class="row">
+        @await Component.InvokeAsync("Results")
+    </div>
 }
 
 

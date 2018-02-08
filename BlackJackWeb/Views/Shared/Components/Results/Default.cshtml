@@ -13,8 +13,16 @@
     {
         <h1>You won!!  Please play again!</h1>
     }
+    else if (Model.FinalResults == GameCreator.Results.Shuffle)
+    {
+        <h1>Deck is reshuffled.  Please Continue</h1>
+
+        <div class="button">
+            <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Continue">Play Again</a>
+        </div>
+    }
 
     <div class="button">
-        <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Continue">Play Again</a>
+        <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="NewGame">Play Again</a>
     </div>
 </div>

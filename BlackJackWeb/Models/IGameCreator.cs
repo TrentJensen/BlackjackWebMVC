@@ -12,5 +12,6 @@ namespace BlackJackWeb.Models
         void PullDealerCard();
         void PullPlayerCard();
         void PlayerStand();
+        void Continue();
     }
 }
