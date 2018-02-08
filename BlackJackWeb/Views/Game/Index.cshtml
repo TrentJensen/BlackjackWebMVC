@@ -1,0 +1,55 @@
+﻿@model GameCreator
+
+<div class="row">
+    <div class="col-md-11">
+        @if (Model.Stand)
+        {
+        <img class="img-responsive" src="~/@Model.DealerHand[0].ImageName" />
+        }
+        else
+        {
+        <img class="img-responsive" src="~/images/back.jpg" />
+        }
+
+        @foreach (var card in Model.DealerHand.Skip(1))
+        {
+        <img class="img-responsive" src="~/@card.ImageName" />
+        }
+    </div>
+    <div class="col-md-1">
+        <h1 class="text-center">Dealer Points: @Model.DealerScore</h1>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-11 col-sm-11">
+        @foreach (var card in Model.PlayerHand)
+        {
+        <img class="img-responsive" src="~/@card.ImageName" />
+        }
+    </div>
+    <div class="col-md-1">
+        <h1 class="text-center">Player Points: @Model.PlayerScore</h1>
+    </div>
+</div>
+
+@if (Model.FinalResults == GameCreator.Results.Playing)
+{
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6 button btn-group">
+            <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Hit">Hit Me</a>
+            <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Stand">Stand</a>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+}
+else
+{
+@await Component.InvokeAsync("Results")
+}
+
+
+

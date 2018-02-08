@@ -1,38 +1,4 @@
-﻿@model GameCreator
-
-<div class="row">
-    @if (Model.Hold)
-    {
-        <img src="@Model.DealerHand[0].ImageName" />
-    }
-    else
-    {
-        <img class="img-rounded" src="~/images/back.jpg" />
-    }
-
-    @foreach (var card in Model.DealerHand.Skip(1))
-    {
-        <img src="@card.ImageName" />
-    }
+﻿<h1>Press here to play</h1>
+<div class="col-md-6 button btn-group">
+    <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Index">Hit Me</a>
 </div>
-
-<hr />
-    
-<div class="row">
-    @foreach (var card in Model.PlayerHand)
-    {
-        <img class="img-rounded" src="@card.ImageName" />
-
-    }
-    <h1 class="pull-right">Player Points: @Model.PlayerScore</h1>
-</div>
-
-<div class="list-inline">
-    <p class="button">
-        <a class="btn btn-primary" asp-controller="Home" asp-action="Hit">Hit Me</a>
-    </p>
-    <p class="button">
-        <a class="btn btn-primary" asp-controller="Home" asp-action="Hold">Hold</a>
-    </p>
-</div>
-

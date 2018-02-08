@@ -2546,7 +2546,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 						}
 					}
 
-					// Discard index placeholder values to get only actual matches
+					// Discard index placeStander values to get only actual matches
 					setMatched = condense( setMatched );
 				}
 
@@ -3861,7 +3861,7 @@ jQuery.extend( {
 	// Handle when the DOM is ready
 	ready: function( wait ) {
 
-		// Abort if there are pending holds or we're already ready
+		// Abort if there are pending Stands or we're already ready
 		if ( wait === true ? --jQuery.readyWait : jQuery.isReady ) {
 			return;
 		}
@@ -8179,8 +8179,8 @@ jQuery.proxy = function( fn, context ) {
 	return proxy;
 };
 
-jQuery.holdReady = function( hold ) {
-	if ( hold ) {
+jQuery.StandReady = function( Stand ) {
+	if ( Stand ) {
 		jQuery.readyWait++;
 	} else {
 		jQuery.ready( true );

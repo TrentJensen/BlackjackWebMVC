@@ -1,14 +1,16 @@
 ﻿body {
     background-color: green;
+    padding-top: 65px;
 }
 
 img {
     padding-right: 10px;
     padding-top: 10px;
+    width: 200px;
 }
 
 h1 {
     margin: .67em 0;
     color: white;
-    font-size: 3em;
+    font-size: 2em;
 }

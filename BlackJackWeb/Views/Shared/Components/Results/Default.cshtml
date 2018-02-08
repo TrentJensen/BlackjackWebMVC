@@ -1,0 +1,20 @@
+﻿@model GameCreator
+
+<div style="background-color: gold">
+    @if (Model.FinalResults == GameCreator.Results.Bust)
+    {
+        <h1>You busted!  Please play again!</h1>
+    }
+    else if (Model.FinalResults == GameCreator.Results.DealerWins)
+    {
+        <h1>Dealer wins!</h1>
+    }
+    else if (Model.FinalResults == GameCreator.Results.PlayerWins)
+    {
+        <h1>You won!!  Please play again!</h1>
+    }
+
+    <div class="button">
+        <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Continue">Play Again</a>
+    </div>
+</div>

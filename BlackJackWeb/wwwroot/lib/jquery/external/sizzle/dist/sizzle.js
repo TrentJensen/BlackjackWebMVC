@@ -2047,7 +2047,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 						}
 					}
 
-					// Discard index placeholder values to get only actual matches
+					// Discard index placeStander values to get only actual matches
 					setMatched = condense( setMatched );
 				}
 

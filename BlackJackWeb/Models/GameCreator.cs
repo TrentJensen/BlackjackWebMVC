@@ -12,6 +12,7 @@ namespace BlackJackWeb.Models
         private static int DECK_SIZE = 52;
 
         private List<Card> _deck { get; }
+        private int _hiddenCardValue;
 
         public List<Card> PlayerHand { get; set; }
         public List<Card> DealerHand { get; set; }
@@ -19,7 +20,14 @@ namespace BlackJackWeb.Models
         public int PlayerScore { get; set; }
         public int DealerScore { get; set; }
 
-        public bool Hold = false;
+        private int _playerAces;
+        private int _dealerAces;
+
+        public bool Stand = false;
+
+        public enum Results { Playing, Bust, PlayerWins, DealerWins }
+        public Results FinalResults { get; set; }
+
 
         public string GameId { get; set; }
 
@@ -37,21 +45,22 @@ namespace BlackJackWeb.Models
                     {
                         Rank = rank,
                         Suit = suit,
-                        ImageName = $@"images\{rank}_of_{suit}.jpg"
+                        ImageName = $@"images/{rank}_of_{suit}.jpg"
                     });
                 }
             }
-
-            NewGame();
         }
 
-        private void NewGame()
+        public void NewGame()
         {
-            Hold = false;
+            Stand = false;
+            FinalResults = Results.Playing;
             PlayerHand = new List<Card>();
             DealerHand = new List<Card>();
             PlayerScore = 0;
             DealerScore = 0;
+            _playerAces = 0;
+            _dealerAces = 0;
 
             PullPlayerCard();
             PullDealerCard();
@@ -69,7 +78,9 @@ namespace BlackJackWeb.Models
         //    DealerHand.Clear();
         //}
 
-        //Returns a random card and places it in the player's hand
+        /// <summary>
+        /// Returns a random card and places it in the player's hand
+        /// </summary>
         public void PullPlayerCard()
         {
             Card tempCard;
@@ -86,11 +97,8 @@ namespace BlackJackWeb.Models
             //Update player score
             if (tempCard.Rank == 1)
             {
+                _playerAces++;
                 PlayerScore += 11;
-                if (PlayerScore > 21)
-                {
-                    PlayerScore -= 10;
-                }
             }
             else if (tempCard.Rank < 11)
             {
@@ -100,13 +108,39 @@ namespace BlackJackWeb.Models
             {
                 PlayerScore += 10;
             }
+
+            //Changes Aces from 11 to 1 if hand is over 21
+            if (_playerAces > 0)
+            {
+                int count = 0;
+
+                while (PlayerScore > 21 && count < _playerAces)
+                {
+                    PlayerScore -= 10;
+                    count++;
+                }
+            }
+
+            //If player busts
+            if (PlayerScore > 21)
+            {
+                Stand = true;
+                FinalResults = Results.Bust;
+            }
+            else if (PlayerScore == 21)
+            {
+                PlayerStand();
+            }
         }
 
-        //Returns a random card and places it in the dealer's hand
+        /// <summary>
+        /// Returns a random card and places it in the dealer's hand
+        /// </summary>
         public void PullDealerCard()
         {
             Card tempCard;
             int randNum;
+            int newValue = 0;
             Random random = new Random();
 
             randNum = random.Next(0, _deck.Count());
@@ -119,25 +153,41 @@ namespace BlackJackWeb.Models
             //Update dealer score
             if (tempCard.Rank == 1)
             {
-                DealerScore += 11;
-                if (DealerScore > 21)
-                {
-                    DealerScore -= 10;
-                }
+                _dealerAces++;
+                newValue += 11;
             }
             else if (tempCard.Rank < 11)
             {
-                DealerScore += tempCard.Rank;
+                newValue += tempCard.Rank;
             }
             else if (tempCard.Rank >= 11)
             {
-                DealerScore += 10;
+                newValue += 10;
+            }
+
+            //Hold the value of the first card a secret
+            if (DealerHand.Count == 1)
+                _hiddenCardValue = newValue;
+            else
+                DealerScore += newValue;
+
+            //Changes Aces from 11 to 1 if hand is over 21
+            if (_dealerAces > 0)
+            {
+                int count = 0;
+
+                while (DealerScore > 21 && count < _dealerAces)
+                {
+                    DealerScore -= 10;
+                    count++;
+                }
             }
         }
 
-        public void PlayerHold()
+        public void PlayerStand()
         {
-            Hold = true;
+            Stand = true;
+            DealerScore += _hiddenCardValue;
 
             while (DealerScore < 21)
             {
@@ -147,6 +197,20 @@ namespace BlackJackWeb.Models
                 }
 
                 PullDealerCard();
+            }
+
+            EndResults();
+        }
+
+        private void EndResults()
+        {
+            if (DealerScore > 21)
+            {
+                FinalResults = Results.PlayerWins;
+            }
+            else if (DealerScore <= 21 && DealerScore >= PlayerScore)
+            {
+                FinalResults = Results.DealerWins;
             }
         }
     }

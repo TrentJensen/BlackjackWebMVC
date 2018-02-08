@@ -9,7 +9,7 @@
 // - Box sizing
 // - Content columns
 // - Hyphens
-// - Placeholder text
+// - PlaceStander text
 // - Transformations
 // - Transitions
 // - User Select
@@ -97,15 +97,15 @@
           hyphens: @mode;
 }
 
-// Placeholder text
-.placeholder(@color: @input-color-placeholder) {
+// PlaceStander text
+.placeStander(@color: @input-color-placeStander) {
   // Firefox
-  &::-moz-placeholder {
+  &::-moz-placeStander {
     color: @color;
     opacity: 1; // Override Firefox's unusual default opacity; see https://github.com/twbs/bootstrap/pull/11526
   }
-  &:-ms-input-placeholder { color: @color; } // Internet Explorer 10+
-  &::-webkit-input-placeholder  { color: @color; } // Safari and Chrome
+  &:-ms-input-placeStander { color: @color; } // Internet Explorer 10+
+  &::-webkit-input-placeStander  { color: @color; } // Safari and Chrome
 }
 
 // Transformations
