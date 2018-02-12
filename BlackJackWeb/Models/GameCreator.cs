@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,13 +21,32 @@ namespace BlackJackWeb.Models
         public int PlayerScore { get; set; }
         public int DealerScore { get; set; }
 
+        public int PlayerChips { get; set; }
+
+
+        private int _bet;
+        [Required]
+        [RegularExpression("^[0-9]*$", ErrorMessage =" Please enter a number")]
+        //[GreaterThan(100)]
+        public int Bet
+        {
+            get { return _bet; }
+            set
+            {
+                if (value <= PlayerChips)
+                    _bet = value;
+                else
+                    _bet = PlayerChips;
+            }
+        }
+
         private int _playerAces;
         private int _dealerAces;
 
         public bool Stand = false;
 
-        public enum Results { Playing, Bust, PlayerWins, DealerWins, Shuffle }
-        public Results FinalResults { get; set; }
+        public enum Results { Bet, Playing, Bust, PlayerWins, DealerWins, Shuffle, Broke }
+        public Results GameMode { get; set; }
 
         public string GameId { get; set; }
 
@@ -36,28 +56,18 @@ namespace BlackJackWeb.Models
         public GameCreator()
         {
             _deck = new List<Card>(DECK_SIZE);
-            foreach (var suit in new[] { "Spades", "Hearts", "Clubs", "Diamonds", })
-            {
-                for (var rank = 1; rank <= (DECK_SIZE / 4); rank++)
-                {
-                    _deck.Add(new Card
-                    {
-                        Rank = rank,
-                        Suit = suit,
-                        ImageName = $@"images/{rank}_of_{suit}.jpg"
-                    });
-                }
-            }
         }
 
         public void NewGame()
         {
+            Shuffle();
             Stand = false;
-            FinalResults = Results.Playing;
+            GameMode = Results.Bet;
             PlayerHand = new List<Card>();
             DealerHand = new List<Card>();
             PlayerScore = 0;
             DealerScore = 0;
+            PlayerChips = 100;
             _playerAces = 0;
             _dealerAces = 0;
 
@@ -66,16 +76,11 @@ namespace BlackJackWeb.Models
             PullDealerCard();
         }
 
-        //public void GetGame(IServiceProvider services)
-        //{
-        //    ISession session = services.GetRequiredService<IHttpContextAccessor>()?
-        //        .HttpContext.Session;
-
-        //    var context = services.GetService<AppDbContext>();
-
-        //    PlayerHand.Clear();
-        //    DealerHand.Clear();
-        //}
+        public void MakeBet(int bet)
+        {
+            Bet = bet;
+            GameMode = Results.Playing;
+        }
 
         /// <summary>
         /// Returns a random card and places it in the player's hand
@@ -88,7 +93,7 @@ namespace BlackJackWeb.Models
 
             if (_deck.Count == 0)
             {
-                FinalResults = Results.Shuffle;
+                GameMode = Results.Shuffle;
                 Shuffle();
             }
             else
@@ -131,7 +136,8 @@ namespace BlackJackWeb.Models
                 if (PlayerScore > 21)
                 {
                     Stand = true;
-                    FinalResults = Results.Bust;
+                    GameMode = Results.Bust;
+                    PlayerChips -= Bet;
                 }
                 else if (PlayerScore == 21)
                 {
@@ -152,7 +158,7 @@ namespace BlackJackWeb.Models
 
             if (_deck.Count == 0)
             {
-                FinalResults = Results.Shuffle;
+                GameMode = Results.Shuffle;
                 Shuffle();
             }
             else
@@ -200,6 +206,21 @@ namespace BlackJackWeb.Models
             }
         }
 
+        public void Double()
+        {
+            Bet = Bet * 2;
+            PullPlayerCard();
+
+            if (PlayerScore <= 21)
+                PlayerStand();
+            else
+            {
+                Stand = true;
+                GameMode = Results.Bust;
+                PlayerChips -= Bet;
+            }
+        }
+
         public void PlayerStand()
         {
             Stand = true;
@@ -235,21 +256,45 @@ namespace BlackJackWeb.Models
             }
         }
 
-        public void Continue()
+        public void NextGame()
         {
-            FinalResults = Results.Playing;
+            Stand = false;
+            GameMode = Results.Bet;
+            PlayerHand.Clear();
+            DealerHand.Clear();
+            PlayerScore = 0;
+            DealerScore = 0;
+            _playerAces = 0;
+            _dealerAces = 0;
+            Bet = 0;
+
+            PullPlayerCard();
+            PullDealerCard();
+            PullDealerCard();
         }
 
         private void EndResults()
         {
             if (DealerScore > 21)
             {
-                FinalResults = Results.PlayerWins;
+                GameMode = Results.PlayerWins;
+                PlayerChips += Bet;
             }
             else if (DealerScore <= 21 && DealerScore >= PlayerScore)
             {
-                FinalResults = Results.DealerWins;
+                GameMode = Results.DealerWins;
+                PlayerChips -= Bet;
             }
+
+            if (PlayerChips <= 0)
+            {
+                GameMode = Results.Broke;
+            }
+        }
+
+        public void Continue()
+        {
+            throw new NotImplementedException();
         }
     }
 }

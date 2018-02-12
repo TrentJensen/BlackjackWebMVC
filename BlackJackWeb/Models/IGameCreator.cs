@@ -9,9 +9,12 @@ namespace BlackJackWeb.Models
         int PlayerScore { get; set; }
 
         void NewGame();
+        void MakeBet(int bet);
         void PullDealerCard();
         void PullPlayerCard();
         void PlayerStand();
+        void Double();
+        void NextGame();
         void Continue();
     }
 }

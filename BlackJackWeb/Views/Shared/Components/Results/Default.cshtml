@@ -1,19 +1,19 @@
 ﻿@model GameCreator
 
 <div style="background-color: gold">
-    @if (Model.FinalResults == GameCreator.Results.Bust)
+    @if (Model.GameMode == GameCreator.Results.Bust)
     {
         <h1>You busted!  Please play again!</h1>
     }
-    else if (Model.FinalResults == GameCreator.Results.DealerWins)
+    else if (Model.GameMode == GameCreator.Results.DealerWins)
     {
         <h1>Dealer wins!</h1>
     }
-    else if (Model.FinalResults == GameCreator.Results.PlayerWins)
+    else if (Model.GameMode == GameCreator.Results.PlayerWins)
     {
         <h1>You won!!  Please play again!</h1>
     }
-    else if (Model.FinalResults == GameCreator.Results.Shuffle)
+    else if (Model.GameMode == GameCreator.Results.Shuffle)
     {
         <h1>Deck is reshuffled.  Please Continue</h1>
 
@@ -21,8 +21,16 @@
             <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Continue">Play Again</a>
         </div>
     }
+    else if (Model.GameMode == GameCreator.Results.Broke)
+    {
+        <h1>You are out of chips!  Please start over with a new deck.</h1>
+
+        <div class="button">
+            <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="NewGame">Play Again</a>
+        </div>
+    }
 
     <div class="button">
-        <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="NewGame">Play Again</a>
+        <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="NextGame">Play Again</a>
     </div>
 </div>

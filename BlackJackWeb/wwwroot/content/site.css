@@ -10,9 +10,23 @@ img {
 h1 {
     margin: .67em 0;
     color: white;
-    font-size: 2em;
+    font-size: 1.5em;
+}
+
+#bootstrap-overrides h2 {
+    color: white;
 }
 
 .center-block {
     float: none;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+    background-color: #fcaeae !important;
+    border-color: #fba1a1 !important;
+}
+
+.btn {
+    background-color: #fcaeae !important;
+    border-color: #fba1a1 !important;
 }

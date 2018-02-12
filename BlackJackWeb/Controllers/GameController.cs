@@ -27,17 +27,32 @@ namespace BlackJackWeb.Controllers
             return View(_gameCreator);
         }
 
+        [HttpPost]
+        public IActionResult Index(int bet)
+        {
+            if (ModelState.IsValid)
+            {
+                _gameCreator.MakeBet(bet);
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
+        }
+
         public RedirectToActionResult Hit()
         {
             _gameCreator.PullPlayerCard();
-
             return RedirectToAction("Index", "Game");
         }
 
         public RedirectToActionResult Stand()
         {
             _gameCreator.PlayerStand();
+            return RedirectToAction("Index");
+        }
 
+        public RedirectToActionResult Double()
+        {
+            _gameCreator.Double();
             return RedirectToAction("Index");
         }
 
@@ -50,6 +65,12 @@ namespace BlackJackWeb.Controllers
         public RedirectToActionResult Continue()
         {
             _gameCreator.Continue();
+            return RedirectToAction("Index");
+        }
+
+        public RedirectToActionResult NextGame()
+        {
+            _gameCreator.NextGame();
             return RedirectToAction("Index");
         }
     }

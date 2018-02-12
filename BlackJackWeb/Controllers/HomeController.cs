@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BlackJackWeb.Models;
-using BlackJackWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlackJackWeb.Controllers
