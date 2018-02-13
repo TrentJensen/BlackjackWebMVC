@@ -1,4 +1,35 @@
-﻿<h1>Press here to play</h1>
-<div class="col-md-6 button btn-group">
-    <a class="btn btn-primary btn-lg" asp-controller="Game" asp-action="Index">Hit Me</a>
-</div>
+﻿@model Game
+
+<form asp-action="Index" method="post" role="form">
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-primary active">
+            <input asp-for="Decks" type="radio" value="1" checked="checked"/>1 Deck
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="2" />2 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="3" />3 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="4" />4 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="5" />5 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="6" />6 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="7" />7 Decks
+        </label>
+        <label class="btn btn-primary">
+            <input asp-for="Decks" type="radio" value="8" />8 Decks
+        </label>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-5">
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </div>
+</form>

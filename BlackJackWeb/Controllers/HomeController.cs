@@ -19,8 +19,15 @@ namespace BlackJackWeb.Controllers
 
         public IActionResult Index()
         {
-            _gameCreator.NewGame();
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index(Game game)
+        {
+            _gameCreator.SetGame(game);
+            _gameCreator.NewGame();
+            return RedirectToAction("Index", "Game");
         }
     }
 }

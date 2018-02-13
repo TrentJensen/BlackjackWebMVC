@@ -10,10 +10,11 @@ namespace BlackJackWeb.Models
 {
     public class GameCreator : IGameCreator
     {
-        private static int DECK_SIZE = 52;
+        private int _deckSize { get; set; } = 52;
 
-        private List<Card> _deck { get; }
-        private int _hiddenCardValue;
+        private List<Card> _deck { get; set; }
+
+        private int _hiddenDealerCard;
 
         public List<Card> PlayerHand { get; set; }
         public List<Card> DealerHand { get; set; }
@@ -22,7 +23,6 @@ namespace BlackJackWeb.Models
         public int DealerScore { get; set; }
 
         public int PlayerChips { get; set; }
-
 
         private int _bet;
         [Required]
@@ -33,7 +33,9 @@ namespace BlackJackWeb.Models
             get { return _bet; }
             set
             {
-                if (value <= PlayerChips)
+                if (value < 0)
+                    _bet = 0;
+                else if (value <= PlayerChips)
                     _bet = value;
                 else
                     _bet = PlayerChips;
@@ -43,9 +45,10 @@ namespace BlackJackWeb.Models
         private int _playerAces;
         private int _dealerAces;
 
+        public bool Insurance = false;
         public bool Stand = false;
 
-        public enum Results { Bet, Playing, Bust, PlayerWins, DealerWins, Shuffle, Broke }
+        public enum Results { Bet, Playing, Bust, PlayerWins, DealerWins, Push, Shuffle, Broke }
         public Results GameMode { get; set; }
 
         public string GameId { get; set; }
@@ -55,25 +58,53 @@ namespace BlackJackWeb.Models
         /// </summary>
         public GameCreator()
         {
-            _deck = new List<Card>(DECK_SIZE);
+            
+        }
+
+        public void SetGame(Game game)
+        {
+            _deckSize = game.Decks;
+            
+            _deck = new List<Card>(_deckSize * 52);
         }
 
         public void NewGame()
         {
             Shuffle();
             Stand = false;
+            PlayerChips = 100;
             GameMode = Results.Bet;
             PlayerHand = new List<Card>();
             DealerHand = new List<Card>();
+            NextGame();
+        }
+
+        public void NextGame()
+        {
+            GameMode = Results.Bet;
+            PlayerHand.Clear();
+            DealerHand.Clear();
             PlayerScore = 0;
             DealerScore = 0;
-            PlayerChips = 100;
             _playerAces = 0;
             _dealerAces = 0;
+            Bet = 0;
 
             PullPlayerCard();
             PullDealerCard();
             PullDealerCard();
+
+            //Check if player has blackjack
+            if (PlayerScore == 21)
+            {
+                Blackjack();
+            }
+
+            //Check if insurance applies
+            if (DealerScore == 11)
+            {
+                InsuranceBet();
+            }
         }
 
         public void MakeBet(int bet)
@@ -187,9 +218,10 @@ namespace BlackJackWeb.Models
 
                 //Hold the value of the first card a secret
                 if (DealerHand.Count == 1)
-                    _hiddenCardValue = newValue;
+                    _hiddenDealerCard =+ newValue;
                 else
                     DealerScore += newValue;
+                
 
                 //Changes Aces from 11 to 1 if hand is over 21
                 if (_dealerAces > 0)
@@ -204,6 +236,23 @@ namespace BlackJackWeb.Models
                     }
                 }
             }
+        }
+
+        public void Blackjack()
+        {
+            DealerScore += _hiddenDealerCard;
+            if (DealerScore == 21)
+                GameMode = Results.Push;
+            else
+            { 
+                GameMode = Results.PlayerWins;
+                PlayerChips += (Bet * (3/2));
+            }
+        }
+
+        public void InsuranceBet()
+        {
+            
         }
 
         public void Double()
@@ -224,7 +273,7 @@ namespace BlackJackWeb.Models
         public void PlayerStand()
         {
             Stand = true;
-            DealerScore += _hiddenCardValue;
+            DealerScore += _hiddenDealerCard;
 
             while (DealerScore < 21)
             {
@@ -242,35 +291,21 @@ namespace BlackJackWeb.Models
         private void Shuffle()
         {
             _deck.Clear();
-            foreach (var suit in new[] { "Spades", "Hearts", "Clubs", "Diamonds", })
+            for (var decks = 1; decks <= _deckSize; decks++)
             {
-                for (var rank = 1; rank <= (DECK_SIZE / 4); rank++)
+                foreach (var suit in new[] { "Spades", "Hearts", "Clubs", "Diamonds", })
                 {
-                    _deck.Add(new Card
+                    for (var rank = 1; rank <= 13; rank++)
                     {
-                        Rank = rank,
-                        Suit = suit,
-                        ImageName = $@"images/{rank}_of_{suit}.jpg"
-                    });
+                        _deck.Add(new Card
+                        {
+                            Rank = rank,
+                            Suit = suit,
+                            ImageName = $@"images/{rank}_of_{suit}.jpg"
+                        });
+                    }
                 }
             }
-        }
-
-        public void NextGame()
-        {
-            Stand = false;
-            GameMode = Results.Bet;
-            PlayerHand.Clear();
-            DealerHand.Clear();
-            PlayerScore = 0;
-            DealerScore = 0;
-            _playerAces = 0;
-            _dealerAces = 0;
-            Bet = 0;
-
-            PullPlayerCard();
-            PullDealerCard();
-            PullDealerCard();
         }
 
         private void EndResults()

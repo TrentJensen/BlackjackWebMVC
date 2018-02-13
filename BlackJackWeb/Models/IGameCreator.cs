@@ -8,6 +8,7 @@ namespace BlackJackWeb.Models
         List<Card> PlayerHand { get; set; }
         int PlayerScore { get; set; }
 
+        void SetGame(Game game);
         void NewGame();
         void MakeBet(int bet);
         void PullDealerCard();
